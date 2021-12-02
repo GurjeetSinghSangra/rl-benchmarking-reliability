@@ -55,8 +55,6 @@
 \maketitle
 
 \begin{abstract}
-	We summarize in this paper pitfalls and issues of reinforcement learning models. We then report a recent paper in order effectively quantify agent's learning and allow to compare with different approaches.
-	
 \end{abstract}
 
 \section{Introduction}
@@ -72,8 +70,6 @@ In addition, as reported by Henderson et.al in their paper~\cite{DRL01}, the imp
 In spite of the fact that more benchmarks are now released, there has not been defined a guideline or standardized method for fair comparisons among algorithms, and if tests are carried out poorly they can lead to misleading results. In addition, benchmarks are also used improperly and in a naive way for comparing different algorithms, indeed they should be exploited better, as we will see in this report.
 For this reason, defining the appropriate metrics and statistical tests are essentially required to diagnose and compare different models approaches.\\
 Indeed, we will discuss through this paper some recent measures and statistical, proposed by Google Research and Berkeley EECS~\cite{GoogleMeasure}, which are based on robust statistics and tests to assess the reliability and reproducibility of reinforcement learning model that deal with high instability in their results. Finally based on these measures they proposed a fair comparing method to evaluate different models that we will briefly discuss.
-
-
 \section{Method}
 In this section, we state past and recent measures and test methodologies proposed in the scientific literature to assess evaluation methods of reinforcement learning models. For each approach we describe the proposed method but also their usage, aims, explanatory power, and highlight issues related to the measures and their applications.
 \paragraph{Common metrics}
@@ -96,13 +92,9 @@ Another type of inconsistency in performances of RL models regards multi-environ
 They have found that algorithms performances can differ significantly depending on the chosen environment, leading to misleading results when comparing different algorithms. Thus, it should be more considered not just test the model on a single environments but also compare the learning of the agent on multiple environments in order to understand their variance and reliability.\\
 In their papers some of the causes of this issue have also been detected, they addressed two major factors, the presence of biases in the learning of the agent or because of preprocessing techniques applied on the environment. Indeed, in their experiments they found that biases in the agent can be introduced with reward scaling normalization layers which can have a large effect in gradient based methods. Large and sparse output scale can result in problem regarding saturation and inefficiency in the learning, thus compressing the space of estimated expected returns in action value function based method using reward scaling can be very fruitful to agent. But results are inconsistent across environments causing failure to learn on unstable environment where Deep Q-Value function approximator are used or where untuned reward scales are defined. To overcome this issues a better approach would be to adaptively rescale reward targets with normalized stochastic gradient a made by Van Hasselt et.al in their work ~\cite{VaHasselt}.
 \paragraph{MBRL}
-All the previous issues and methods are applied to any Reinforcement Learning algorithm, but when considering Model-based Reinforcement Learning (MBRL) more tests are required to carry out. These type of algorithm have the potential to be significantly more sample efficient by modelling the transition dynamic. But research in this particular field has not been very standardized. Indeed, it is common that experiments are carried out with self-designed environment, which are sometimes closed-sourced, leading to un-reproducible algorithms.\\
-For this reason in Wang et.al work ~\cite{MBRLBenchmarking} have addressed this issue by proposing new benchmark environments designed for MBRL. They adapted many common environments of model-free RL for MBRL, because
-contrary to free model approaches, MBRL requires access to an analytics differentiable reward function, such that the gradient can be compute. For this reason in their work they adapted the environment by adapting or approximating the reward functions in order to make them differentiable.\\
-In their work, they also 
-
-
-\paragraph{Robust statistics and reliability}
+All the previous issues and methods can be applied to any Reinforcement Learning algorithm, but when considering Model-based Reinforcement Learning (MBRL) more tests are required to carry out. These type of algorithm have the potential to be significantly more sample efficient by modelling the transition dynamic. Thus, evaluation on the errors made in the transition dynamic and its effect on the policy learned have to be analyzed using the related loss function and metrics.\\
+Research in this particular field of RL has not been very standardized. Indeed, it is common that experiments are carried out with self-designed environment, which are sometimes closed-sourced, leading to un-reproducible algorithms. For this reason,  Wang et.al have addressed this issue in their work~\cite{MBRLBenchmarking}, by proposing new benchmark environments designed for MBRL. They adapted many common environments of model-free RL for MBRL, because contrary to free model approaches, MBRL requires access to an analytical differentiable reward function, such that the gradient can be computed. Thus, in their work they adapted or approximated the reward functions in order to make them differentiable.\\ Furthermore, based on their experiments, they have been able also to detect main causes of performance stagnation of models-based methods. The major one regards the Dynamic bottleneck i.e when the learned dynamics are stuck at performance local minima significantly worse than using ground-truth dynamics. They address that the cause of this issue is due to accumulates prediction errors, since MBRL inevitably involves prediction on unseen states. But also because the policy and the learning of dynamics is couples by making the agents more prone to performance local-minima.
+\paragraph{Reliability and robust statistics}
 As we have seen through different proposed approaches and issues, reliability is a major problem in RL algorithms. Recently, thanks to  Berkeley EECS and Google Research collaboration, some efforts have been made into defining adequate metric to quantify different aspect of reliability. In their work~\cite{GoogleMeasure}, they designed statistical test for enabling rigorous comparisons of algorithms by using robust statistics. These metrics measure the reliability by looking at different aspects: reproducibility, stability, variability/dispersion, and risk.\\
 All these properties can be detected by measuring dispersion, and risk of the average rewards. The former one, measure the width of the distribution and it is inferred using the \textbf{Inter-quartile range (IQR)}, i.e the difference between the 75th and 25th percentile, $ IQR(X) = Q_3(X) - Q_1(X)$, this metric does not require assuming normality of the distribution and it is suitable for asymmetric distribution.
 Instead, Risk can be derived by quantifying the heaviness and extend of the lower tail of the distribution, which give us the worst-case scenarios of the performances. To measure it \textbf{Conditional Value at Risk (CVaR)} can be used and it is defined as:
@@ -151,7 +143,7 @@ From the methods described in the previous section, different experiments have b
 As mentioned in the first part of the Method section, the confidence interval is the simplest measure that has been considered when using RL models. Although its simplicity, it can be used to tune major hyperparameters of an algorithm and can highlight also the learning progress of the agent, but even some of its pitfalls. An example of its usage can be seen in the following Figure ~\ref{fig:sample_size} from Henderson et.al work. In this plot, we can see an example of reporting the CI, but also the instability of the TRPO \cite{TRPO} algorithm detected by using the same hyperparameter configuration proposed by the original paper on the HalfCheetah-v1 agent of OpenAI Gym environment. This result shows the inconsistency of the algorithms even by averaging the models across two different sets of runs. As we previously see, this issue can be overcome by applying power analysis tests to estimate the required sample size for a consistent learning behaviour and avoid statistically different distributions of the average return for the same algorithm across runs.
 \begin{figure}[!]
 	\centering
-	\includegraphics[scale=0.15]{./images/sample_size_dist.png}
+	\includegraphics[width=8cm, height=4cm]{./images/sample_size_dist.png}
 	\caption{TRPO on HalfCheetah-v1~\cite{DRL01}}
 	\label{fig:sample_size}
 \end{figure}
@@ -162,7 +154,7 @@ The SAC model in all the scenarios has a very fast initial learning behaviour, b
 
 \begin{figure*}[!htp]
 	\centering
-	\includegraphics[scale=0.3]{./images/Environements_plot.png}
+	\includegraphics[width=15cm,height=5cm]{./images/Environements_plot.png}
 	\caption{Environment inconsistency \cite{BenchmarkingDRL}}
 	\label{fig:env}
 	\footnotesize{}
@@ -172,7 +164,7 @@ In order to prove the separate dimension of reliability from mean and median per
 
 \begin{figure}[!htp]
 	\centering
-	\includegraphics[scale=0.3]{./images/atari_ranking.png}
+	\includegraphics[width=8cm, height=7cm]{./images/atari_ranking.png}
 	\caption{Ranking of reliability metrics on 60 Atari games~\cite{GoogleMeasure}}
 	\label{fig:realibility}
 	\footnotesize{}
@@ -180,17 +172,10 @@ In order to prove the separate dimension of reliability from mean and median per
 
 
 \section{Conclusion}
-In this paper we have seen different issues and aspects of reproducibility and evaluation criteria on RL models. In particular, we have seen novel measures and tests based on robust statistics  for evaluating reliability of a model, which is obscured to mean and median metrics. Thanks to all these methods, we are able to give more explanatory power of RL models results, in addition, they allow to understand strengths and weaknesses of the model, in order to improve existing algorithm, but also for suggesting future works for building robust, and reliable models.\\
+In this paper we have seen different issues and aspects of reproducibility and evaluation criteria on RL models. In particular, we have seen novel measures and tests based on robust statistics for evaluating reliability of a model, which is obscured to mean and median metrics. Thanks to all these methods, we are able to give more explanatory power of RL models results, in addition, they allow to understand strengths and weaknesses of the model, in order to improve existing algorithm, but also for suggesting future works for building robust, and reliable models.\\
 We hope that more research and focus will be done on robust metrics to implement reliable and reproducible models.
 
-practical recommendations for the evaluating models.
 \clearpage
-
-
-\section{Appendix}
-
-Optionally include extra information (complete proofs, additional experiments and plots) in the appendix.
-This section will often be part of the supplemental material.
 
 {\small
 	\bibliographystyle{ieee_fullname}
